@@ -1,2 +1,2 @@
-# FE-Restify
+# restify-project
 code untuk frontend Restify
