@@ -14,10 +14,6 @@ export default function RootPage() {
     }, 2500);
     return () => clearTimeout(timer);
   }, []);
-
-  // ==========================================
-  // TAMPILAN 1: SPLASH SCREEN (Diperbaiki: Background Hijau)
-  // ==========================================
   if (showSplash) {
     return (
       // PASTIKAN class 'bg-restify-olive' ini ada
@@ -36,9 +32,6 @@ export default function RootPage() {
     );
   }
 
-  // ==========================================
-  // TAMPILAN 2: INTRO SCREEN (Diperbaiki: Tambah Button)
-  // ==========================================
   return (
     <main className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center animate-fade-in">
       <div className="relative w-72 h-72 md:w-96 md:h-96 rounded-full overflow-hidden shadow-[0_20px_50px_rgba(107,127,96,0.3)] mb-12 border-4 border-white">
