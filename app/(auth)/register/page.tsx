@@ -1,8 +1,12 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FiEyeOff } from 'react-icons/fi';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function RegisterPage() {
+    const [showPassword, setShowPassword] = useState(false);
     return (
         <main className="min-h-screen bg-white flex flex-col items-center justify-center p-6 md:p-12 font-sans text-gray-800">
             <div className="w-full max-w-md flex flex-col justify-between min-h-[85vh]">
@@ -44,11 +48,18 @@ export default function RegisterPage() {
                             <label className="block text-xs font-bold text-gray-800 mb-2">Kata Sandi</label>
                             <div className="relative">
                                 <input 
-                                    type="password" 
+                                    type={showPassword ? 'text' : 'password'} 
                                     placeholder="*************"
-                                    className="w-full bg-[#FFFDF0] px-4 py-3.5 rounded-[12px] text-lg font-medium text-gray-800 outline-none placeholder-gray-300 tracking-widest focus:ring-1 focus:ring-[#9FA682] transition-all"
+                                    className="w-full bg-[#FFFDF0] px-4 py-3.5 rounded-[12px] text-sm text-gray-800 outline-none placeholder-gray-300 focus:ring-1 focus:ring-[#9FA682] transition-all"
                                 />
-                                <FiEyeOff className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg cursor-pointer" />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(prev => !prev)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg cursor-pointer focus:outline-none"
+                                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                                >
+                                    {showPassword ? <FiEye /> : <FiEyeOff />}
+                                </button>
                             </div>
                         </div>
 
@@ -97,8 +108,7 @@ export default function RegisterPage() {
                             priority 
                         />
                     </div>
-                </div>
-                
+                </div>   
             </div>
         </main>
     );
