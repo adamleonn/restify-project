@@ -9,7 +9,6 @@ export default function Page() {
   const params = useParams();
   const { id } = params;
 
-  // 🔥 DATA DARI HOME (harus sama)
   const hotels = [
     {
       id: "1",
@@ -33,7 +32,6 @@ export default function Page() {
     }
   ];
 
-  // 🔥 AMBIL DATA SESUAI ID
   const hotel = hotels.find((h) => h.id === id);
 
   if (!hotel) {
