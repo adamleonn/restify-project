@@ -18,8 +18,8 @@ class StoreHotelRequest extends FormRequest
             'address' => 'required|string|max:255',
             'city' => 'required|string|max:100',
 
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
 
             'description' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'

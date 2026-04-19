@@ -11,10 +11,16 @@ class HotelController extends Controller
     // GET ALL HOTELS + FILTER + UI READY
     public function index(Request $request)
     {
-        $query = Hotel::with('rooms')
-            ->withAvg('ratings', 'rating');
+        $query = Hotel::query()
+            ->withAvg('ratings', 'rating')
+            ->withMin('rooms', 'price');
 
-        // filter harga berdasarkan room
+        // search nama hotel
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // filter harga
         if ($request->min_price) {
             $query->whereHas('rooms', function ($q) use ($request) {
                 $q->where('price', '>=', $request->min_price);
@@ -27,15 +33,23 @@ class HotelController extends Controller
             });
         }
 
-        $hotels = $query->get()->map(function ($hotel) {
+        // filter kota
+        if ($request->city) {
+            $query->where('city', $request->city);
+        }
+
+        // sorting
+        if ($request->sort == 'price_asc') {
+            $query->orderBy('rooms_min_price', 'asc');
+        }
+
+        $hotels = $query->paginate(10)->through(function ($hotel) {
             return [
                 'id' => $hotel->id,
                 'name' => $hotel->name,
                 'city' => $hotel->city,
                 'image_url' => $hotel->image_url,
-
-                'price' => $hotel->rooms->min('price'),
-
+                'price' => $hotel->rooms_min_price,
                 'average_rating' => round($hotel->ratings_avg_rating ?? 0, 1),
             ];
         });
