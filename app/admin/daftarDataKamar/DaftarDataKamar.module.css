@@ -25,6 +25,7 @@
 .title {
   justify-self: center;
   text-align: center;
+  font-weight: bold;
 }
 
 .subtitle {
@@ -67,6 +68,10 @@
   cursor: pointer;
   font-size: 18px;
   border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .plus {
@@ -144,8 +149,9 @@
 }
 
 .btn img {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
+  display: block;
 }
 
 .addBtn {

@@ -37,7 +37,7 @@ export default function Page() {
       </div>
 
       <div className={styles.header}>
-        <button className={styles.backBtn} onClick={() => router.push("/admin")}>Kembali</button>
+        <button className={styles.backBtn} onClick={() => router.push("/admin/hotels")}>Kembali</button>
         <h2 className={styles.title}>“Nama Hotel”</h2>
         <button
           className={styles.addBtn}

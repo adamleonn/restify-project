@@ -170,9 +170,15 @@ export default function AdminHotelsPage() {
                                     <label className="block text-xs font-bold text-gray-800 mb-1.5">Lokasi</label>
                                     <input type="text" defaultValue={view === 'edit' ? "WKWKWK Land" : ""} placeholder="Lokasi" className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm outline-none bg-white focus:border-[#5B95F9]" />
                                 </div>
-                                <div className="mt-2 w-[75%] max-w-[200px] h-[110px] border border-gray-400 bg-[#E8EAE9] rounded-sm relative overflow-hidden flex items-center justify-center">
-                                    <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 6px)" }}></div>
-                                    <div className="text-5xl z-10 drop-shadow-md pb-2">📍</div>
+                                <div className="mt-2 w-[75%] max-w-[200px] h-[110px] border border-gray-400 rounded-sm overflow-hidden">
+                                    <iframe
+                                        src="https://www.google.com/maps?q=Bandung&output=embed"
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0 }}
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    ></iframe>
                                 </div>
                             </div>
                             <div className="flex-1 flex flex-col justify-between">

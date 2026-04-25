@@ -7,8 +7,6 @@ import { useRouter } from "next/navigation";
 
 export default function HotelDetail() {
   const searchParams = useSearchParams();
-
-
   const router = useRouter();
 
   const hotel = {
@@ -27,14 +25,158 @@ export default function HotelDetail() {
   const [extraBed, setExtraBed] = useState(1);
   const [room, setRoom] = useState("Deluxe Room");
 
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+
+  const [filters, setFilters] = useState<string[]>([]);
+  const [search, setSearch] = useState<string>("");
+
+  const [showFilter, setShowFilter] = useState(false);
+
+  const [showReview, setShowReview] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+
   const reviewDummy = [
     {
       id: 1,
       name: "Ahmad Fauzi",
       time: "2 hari lalu",
-      text: "Hotel nyaman banget, bersih dan pelayanannya ramah.",
+      text: "Hotel nyaman banget",
+      verified: true,
+      hasPhoto: false,
+    },
+    {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
+    },
+        {
+      id: 2,
+      name: "Budi",
+      time: "1 hari lalu",
+      text: "Mantap banget!",
+      verified: false,
+      hasPhoto: true,
     },
   ];
+
+  const toggleFilter = (filter: string) => {
+    setFilters((prev) =>
+      prev.includes(filter)
+        ? prev.filter((f) => f !== filter)
+        : [...prev, filter]
+    );
+  };
+
+  const filteredReviews = reviewDummy.filter((r) => {
+  if (filters.includes("verified") && !r.verified) return false;
+  if (filters.includes("photo") && !r.hasPhoto) return false;
+
+  if (search && !r.text.toLowerCase().includes(search.toLowerCase()))
+    return false;
+
+  return true;
+  });
 
   if (!hotel.name) return <h2>Data hotel tidak ditemukan</h2>;
 
@@ -111,8 +253,70 @@ export default function HotelDetail() {
         {tab === "ulasan" && (
           <div>
             <h3>Ulasan</h3>
+
+          <div className={styles.filterBar}>
+
+            {/* LEFT */}
+            <div className={styles.filterLeft}>
+
+              {/* tombol utama */}
+              <button
+                className={styles.filterMainBtn}
+                onClick={() => setShowFilter(!showFilter)}
+              >
+                Filter
+              </button>
+
+              {/* 🔥 FILTER MUNCUL KE SAMPING */}
+              {showFilter && (
+                <div className={styles.filterExpand}>
+                  <button
+                    className={filters.includes("verified") ? styles.activeFilter : ""}
+                    onClick={() => toggleFilter("verified")}
+                  >
+                    Terverifikasi
+                  </button>
+
+                  <button
+                    className={filters.includes("latest") ? styles.activeFilter : ""}
+                    onClick={() => toggleFilter("latest")}
+                  >
+                    Terbaru
+                  </button>
+
+                  <button
+                    className={filters.includes("photo") ? styles.activeFilter : ""}
+                    onClick={() => toggleFilter("photo")}
+                  >
+                    Dengan Foto
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* CENTER */}
+            <div className={styles.searchWrapper}>
+              <input
+                placeholder="Cari di ulasan"
+                className={styles.searchInput}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            {/* RIGHT */}
+            <div 
+              className={styles.writeReview}
+              onClick={() => setShowReview(true)}
+            >
+              ✏️ Tulis Ulasan
+            </div>
+
+          </div>
+
+            {/* 🔥 LIST */}
             <div className={styles["review-list"]}>
-              {reviewDummy.map((r) => (
+              {filteredReviews.map((r) => (
                 <div key={r.id} className={styles["review-card"]}>
                   <div className={styles["review-user"]}>
                     <img src="https://i.pravatar.cc/40" />
@@ -159,21 +363,79 @@ export default function HotelDetail() {
                 <div>
                   <h3>Pilih Tanggal</h3>
 
-                  <div className={styles.dateGroup}>
-                    <span className={styles.dateLabel}>Check-in</span>
-                    <div className={styles.dateCard}>
-                      Senin <br /> 10 November 2026
-                    </div>
-                  </div>
+                <div className={styles.dateGroup}>
+                  <span className={styles.dateLabel}>Check in</span>
 
-                  <div className={styles.dateGroup}>
-                    <span className={styles.dateLabel}>Check-out</span>
-                    <div className={styles.dateCard}>
-                      Minggu <br /> 4 Desember 2026
+                  <div className={styles.dateCard}>
+                    <div>
+                      <div className={styles.day}>
+                        {checkIn
+                          ? new Date(checkIn).toLocaleDateString("id-ID", { weekday: "long" })
+                          : "Pilih"}
+                      </div>
+
+                      <div className={styles.fullDate}>
+                        {checkIn
+                          ? new Date(checkIn).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "tanggal"}
+                      </div>
+                    </div>
+
+                    {/* ICON + INPUT */}
+                    <div className={styles.iconWrapper}>
+                      <img src="/images/date-icon.png" className={styles.icon} />
+
+                      <input
+                        type="date"
+                        value={checkIn}
+                        onChange={(e) => setCheckIn(e.target.value)}
+                        className={styles.hiddenDate}
+                      />
                     </div>
                   </div>
                 </div>
 
+                <div className={styles.dateGroup}>
+                  <span className={styles.dateLabel}>Check out</span>
+
+                  <div className={styles.dateCard}>
+                    <div>
+                      <div className={styles.day}>
+                        {checkOut
+                          ? new Date(checkOut).toLocaleDateString("id-ID", { weekday: "long" })
+                          : "Pilih"}
+                      </div>
+
+                      <div className={styles.fullDate}>
+                        {checkOut
+                          ? new Date(checkOut).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })
+                          : "tanggal"}
+                      </div>
+                    </div>
+
+                    <div className={styles.iconWrapper}>
+                      <img src="/images/date-icon.png" className={styles.icon} />
+
+                      <input
+                        type="date"
+                        value={checkOut}
+                        min={checkIn}
+                        onChange={(e) => setCheckOut(e.target.value)}
+                        className={styles.hiddenDate}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                </div>
                 <div>
                   <h3>Pilih Kamar</h3>
                   {["Standard Room","Superior Room","Deluxe Room","Suite Room"].map((r) => (
@@ -244,8 +506,8 @@ export default function HotelDetail() {
 
                 <div className={styles.right}>
                   <p>24 April, 2026 | 14:00</p>
-                  <p>10 November, 2026</p>
-                  <p>04 Desember, 2026</p>
+                  <p>{checkIn || "-"}</p>
+                  <p>{checkOut || "-"}</p>
                   <p>{room}</p>
                   <p>{guest} Orang</p>
                   <p>{extraBed} Kasur</p>
@@ -291,6 +553,55 @@ export default function HotelDetail() {
 
         </div>
       )}
+
+            {/* ================= REVIEW POPUP ================= */}
+      {showReview && (
+        <div className={styles.overlay}>
+          <div className={styles.reviewPopup}>
+
+            <h3>{hotel.name}</h3>
+            <p>{hotel.location}</p>
+
+            {/* ⭐ RATING */}
+            <div className={styles.starRow}>
+              {[1,2,3,4,5].map((i) => (
+                <span
+                  key={i}
+                  onClick={() => setRating(i)}
+                  style={{
+                    cursor: "pointer",
+                    fontSize: "20px",
+                    color: i <= rating ? "#f5b301" : "#ccc"
+                  }}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            {/* TEXT */}
+            <textarea
+              placeholder="Tulis di sini..."
+              value={reviewText}
+              onChange={(e) => setReviewText(e.target.value)}
+              className={styles.reviewInput}
+            />
+
+            <button
+              className={styles.submitReview}
+              onClick={() => {
+                setShowReview(false);
+                setRating(0);
+                setReviewText("");
+              }}
+            >
+              Kirim
+            </button>
+
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 }

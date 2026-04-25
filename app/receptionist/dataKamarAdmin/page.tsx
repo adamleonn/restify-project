@@ -9,6 +9,10 @@ export default function Page() {
 
   const [status, setStatus] = useState("pending");
 
+  const [showCode, setShowCode] = useState(false);
+
+  const transactionCode = "HA! made you look XD";
+
   return (
     <div className={styles.container}>
       {/* TOPBAR */}
@@ -69,7 +73,25 @@ export default function Page() {
           <textarea placeholder="....."></textarea>
 
           <label>Kode Transaksi</label>
-          <input type="password" placeholder="******" />
+
+          <div className={styles.kodeWrapper}>
+          <div className={styles.kodeBox}>
+            {showCode
+              ? transactionCode
+              : "•".repeat(transactionCode.length)
+            }
+
+            <button
+              className={styles.eyeBtn}
+              onClick={() => setShowCode(!showCode)}
+            >
+              <img
+                src={showCode ? "/images/EyeClosed.png" : "/images/Eye.png"}
+                alt="toggle"
+              />
+            </button>
+          </div>
+          </div>
         </div>
       </div>
 

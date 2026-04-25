@@ -149,3 +149,38 @@ button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.kodeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.kodeBox {
+  position: relative;
+  background: #f5f5f5;
+  border: 1px solid #ccc;
+  padding: 10px 40px 10px 10px;
+  border-radius: 8px;
+  font-family: monospace;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.eyeBtn img {
+  width: 20px;
+  height: 20px;
+}

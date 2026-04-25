@@ -40,7 +40,7 @@ export default function Page() {
       </div>
 
       <div className={styles.table}>
-        Tambah Data Kamar Hotel
+        Ubah Data Kamar Hotel
       </div>
 
       <div className={styles.formBox}>
