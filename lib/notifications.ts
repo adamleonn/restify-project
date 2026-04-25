@@ -26,13 +26,13 @@ export const notify = {
             toast.success('Registrasi berhasil, silakan login'),
 
         emailExists: () =>
-            toast.error('Email sudah digunakan'),
+            toast.error('Email ini sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.'),
 
         passwordTooWeak: () =>
-            toast.error('Password minimal 6 karakter'),
+            toast.error('Kata sandi terlalu pendek. Gunakan minimal 6 karakter agar lebih aman.'),
 
         fieldRequired: () =>
-            toast.error('Semua field wajib diisi'),
+            toast.error('Mohon lengkapi semua kolom yang tersedia sebelum melanjutkan.'),
 
         // ── Login: Success (role-based) ────────────────────
         loginSuccessUser: () =>
@@ -59,16 +59,16 @@ export const notify = {
 
         // ── Login: Error ───────────────────────────────────
         emailNotFound: () =>
-            toast.error('Email tidak terdaftar'),
+            toast.error('Kami tidak dapat menemukan akun dengan email tersebut. Pastikan penulisan sudah benar.'),
 
         wrongPassword: () =>
-            toast.error('Password salah'),
+            toast.error('Kata sandi yang Anda masukkan tidak sesuai. Silakan coba lagi.'),
 
         accountInactive: () =>
-            toast.error('Akun tidak aktif, hubungi admin'),
+            toast.error('Akun Anda saat ini sedang dinonaktifkan. Silakan hubungi admin untuk bantuan.'),
 
         rateLimitExceeded: () =>
-            toast.error('Terlalu banyak percobaan login, coba lagi nanti'),
+            toast.error('Demi keamanan, akses dibatasi sementara karena terlalu banyak percobaan. Coba lagi nanti.'),
 
         // ── Authorization ──────────────────────────────────
         accessDenied: () =>
