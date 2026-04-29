@@ -12,6 +12,9 @@ export default function Page() {
   const [showCode, setShowCode] = useState(false);
 
   const transactionCode = "HA! made you look XD";
+  const name = "Elliot";
+  const roomType = "Builder Brothers Pizza";
+  const note = "Pizza! Pizza!";
 
   return (
     <div className={styles.container}>
@@ -39,10 +42,10 @@ export default function Page() {
         {/* LEFT */}
         <div className={styles.formLeft}>
           <label>Nama</label>
-          <input type="text" placeholder="Nama" />
+          <div className={styles.readonlyBox}>{name}</div>
 
           <label>Tipe kamar</label>
-          <input type="text" placeholder="Kamar" />
+          <div className={styles.readonlyBox}>{roomType}</div>
 
           <div className={styles.durasiBox}>
             <div>
@@ -70,7 +73,9 @@ export default function Page() {
         {/* RIGHT */}
         <div className={styles.formRight}>
           <label>Catatan</label>
-          <textarea placeholder="....."></textarea>
+          <div className={styles.readonlyBox}>
+            {note || "-"}
+          </div>
 
           <label>Kode Transaksi</label>
 

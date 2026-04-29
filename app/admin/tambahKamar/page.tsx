@@ -36,7 +36,7 @@ export default function Page() {
 
       <div className={styles.header}>
         <button className={styles.backBtn} onClick={() => router.push("/admin/daftarDataKamar")}>Kembali</button>
-        <h2 className={styles.title}>"WE ARE FORSAKEN"</h2>
+        <h2 className={styles.title}>"Nama Hotel"</h2>
       </div>
 
       <div className={styles.table}>

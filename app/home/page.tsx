@@ -4,8 +4,10 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { RECOMMENDED_HOTELS, NEARBY_HOTELS } from '@/data/mockHotels';
+import { MOCK_NOTIFICATIONS } from '@/data/mockNotifications';
 import { FaMapMarkerAlt, FaStar } from 'react-icons/fa';
 import { FiChevronDown, FiBell, FiSearch, FiFilter } from 'react-icons/fi';
+import NotificationPanel from '@/app/components/NotificationPanel';
 
 
 export default function HomePage() {
@@ -15,6 +17,10 @@ export default function HomePage() {
 
     // State untuk Filter Modal
     const [showFilter, setShowFilter] = useState(false);
+
+    // State untuk panel notifikasi
+    const [showNotif, setShowNotif] = useState(false);
+    const unreadCount = MOCK_NOTIFICATIONS.filter((n) => !n.isRead).length;
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     
@@ -64,6 +70,7 @@ export default function HomePage() {
     });
 
     return (
+        <>
         <main className="min-h-screen bg-white pb-10 text-restify-text-dark font-sans">
             {/* Header: Lokasi, Logo, dan Notifikasi */}
             <header className="flex items-center justify-between py-6">
@@ -85,8 +92,17 @@ export default function HomePage() {
                     <button className="flex items-center justify-center w-10 h-10 border-[1.5px] border-[#5E6B52] rounded-full text-[#5E6B52] font-semibold text-[13px] hover:bg-gray-50 transition-colors">
                         AI
                     </button>
-                    <button className="flex items-center justify-center w-10 h-10 border-[1.5px] border-[#5E6B52] rounded-full hover:bg-gray-50 transition-colors">
+                    {/* Tombol notifikasi dengan badge */}
+                    <button
+                        id="btn-notification"
+                        onClick={() => setShowNotif(true)}
+                        className="relative flex items-center justify-center w-10 h-10 border-[1.5px] border-[#5E6B52] rounded-full hover:bg-gray-50 transition-colors"
+                        aria-label="Buka notifikasi"
+                    >
                         <FiBell className="text-[22px] text-[#5E6B52]" style={{ strokeWidth: 1.5 }} />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-[#E34A42] rounded-full border-2 border-white" />
+                        )}
                     </button>
                 </div>
             </header>
@@ -214,7 +230,7 @@ export default function HomePage() {
 
                         <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-[#5E6B52]/70 scrollbar-track-[#F0EDD8] scrollbar-thumb-rounded-full">
                             {RECOMMENDED_HOTELS.map((hotel) => (
-                                <Link
+                                <Link key={hotel.id}
                                     href={{
                                         pathname: "/detail",
                                         query: {
@@ -226,7 +242,7 @@ export default function HomePage() {
                                         },
                                     }}
                                 >
-                                    <div key={hotel.id} className="flex-shrink-0 w-[260px] bg-white border border-gray-100 rounded-3xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                                    <div className="flex-shrink-0 w-[260px] bg-white border border-gray-100 rounded-3xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                                         <div className="relative w-full h-[150px] rounded-2xl overflow-hidden mb-4">
                                             <Image src={hotel.imageUrl} alt={hotel.name} fill className="object-cover" />
                                         </div>
@@ -264,7 +280,7 @@ export default function HomePage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                             {NEARBY_HOTELS.map((hotel) => (
-                                <Link
+                                <Link key={hotel.id}
                                     href={{
                                         pathname: "/detail",
                                         query: {
@@ -276,7 +292,7 @@ export default function HomePage() {
                                         },
                                     }}
                                 >
-                                <div key={hotel.id} className="flex w-full bg-white border border-gray-100 rounded-3xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-md transition-shadow">
+                                <div className="flex w-full bg-white border border-gray-100 rounded-3xl p-3 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-md transition-shadow">
                                     <div className="relative w-32 h-32 rounded-2xl overflow-hidden flex-shrink-0">
                                         <Image src={hotel.imageUrl} alt={hotel.name} fill className="object-cover" />
                                     </div>
@@ -304,5 +320,8 @@ export default function HomePage() {
                 </>
             )}
         </main>
+        {/* Panel Notifikasi (slide-in dari kanan) */}
+        <NotificationPanel isOpen={showNotif} onClose={() => setShowNotif(false)} />
+        </>
     );
 }

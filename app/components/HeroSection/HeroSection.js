@@ -22,7 +22,7 @@ const HeroSection = () => {
 
         <button
           className="start-btn"
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/welcome")}
         >
           Mulai <span>→</span>
         </button>

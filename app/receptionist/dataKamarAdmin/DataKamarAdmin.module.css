@@ -80,7 +80,7 @@
 
 .divider {
   width: 2px;
-  background: #f2f3f4;
+  background: #ccc;
 }
 
 /* RIGHT */
@@ -183,4 +183,22 @@ button:disabled {
 .eyeBtn img {
   width: 20px;
   height: 20px;
+}
+
+.readonlyBox {
+  background: #f5f5f5;
+  border: 1px solid gray;
+  padding: 10px;
+  border-radius: 6px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* biar catatan bisa multiline */
+.readonlyBox.multiline {
+  align-items: flex-start;
+  min-height: 120px;
+  white-space: pre-wrap;
 }
