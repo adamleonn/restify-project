@@ -43,7 +43,8 @@ class StoreHotelRequest extends FormRequest
 
             'image.image' => 'File harus berupa gambar',
             'image.mimes' => 'Format gambar harus jpg, jpeg, atau png',
-            'image.max' => 'Ukuran gambar maksimal 2MB'
+            'image.max' => 'Ukuran gambar maksimal 2MB',
+            'qris_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }

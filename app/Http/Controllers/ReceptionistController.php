@@ -91,6 +91,7 @@ class ReceptionistController extends Controller
             ], 403);
         }
 
+        // hanya confirmed yang boleh check-in
         if ($booking->status !== 'confirmed') {
             return response()->json([
                 'message' => 'Booking belum dikonfirmasi'
@@ -98,7 +99,12 @@ class ReceptionistController extends Controller
         }
 
         $booking->update([
-            'status' => 'completed'
+            'status' => 'checked_in'
+        ]);
+
+        // kamar jadi booked saat tamu masuk
+        $booking->room->update([
+            'status' => 'booked'
         ]);
 
         return response()->json([

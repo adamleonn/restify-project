@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Hotel extends Model
-{
+{   
     protected $fillable = [
         'name',
         'address',
@@ -13,12 +13,14 @@ class Hotel extends Model
         'latitude',
         'longitude',
         'description',
-        'image'
+        'image',
+        'qris_image'
     ];
 
     protected $appends = [
         'average_rating',
-        'image_url'
+        'image_url',
+        'qris_image_url',
     ];
 
     // RELATION: HOTEL -> ROOMS
@@ -52,4 +54,13 @@ class Hotel extends Model
             ? asset('storage/' . $this->image)
             : null;
     }
+
+    //Untuk Gambar Qris
+    public function getQrisImageUrlAttribute()
+    {
+        return $this->qris_image
+            ? asset('storage/' . $this->qris_image)
+            : null;
+    }
+
 }

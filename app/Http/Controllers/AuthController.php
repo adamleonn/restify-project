@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\resetPassword;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -72,6 +77,78 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logout berhasil'
+        ]);
+    }
+
+    // FORGOT PASSWORD
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Email tidak ditemukan'
+            ], 404);
+        }
+
+        $token = Str::random(60);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'email' => $request->email,
+                'token' => Hash::make($token),
+                'created_at' => now()
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Token reset password berhasil dibuat',
+            'token' => $token
+        ]);
+    }
+
+    // RESET PASSWORD
+    public function resetPassword(resetPassword $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$reset) {
+            return response()->json([
+                'message' => 'Token reset tidak ditemukan'
+            ], 404);
+        }
+
+        if (!Hash::check($request->token, $reset->token)) {
+            return response()->json([
+                'message' => 'Token tidak valid'
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Password berhasil direset'
         ]);
     }
 }

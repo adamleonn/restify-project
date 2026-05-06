@@ -168,8 +168,8 @@ class BookingController extends Controller
             ], 404);
         }
 
-        // hanya bisa checkout jika sudah dikonfirmasi
-        if ($booking->status !== 'confirmed') {
+        // hanya bisa checkout jika sudah check-in
+        if ($booking->status !== 'checked_in') {
             return response()->json([
                 'message' => 'Status tidak valid untuk checkout'
             ], 400);
@@ -187,7 +187,7 @@ class BookingController extends Controller
     }
 
 
-    //PembayaranDetail
+    // Pembayaran Detail
     public function paymentDetail($id)
     {
         $booking = Booking::with(['room.hotel', 'payment'])
@@ -202,10 +202,19 @@ class BookingController extends Controller
         }
 
         return response()->json([
-            'booking_id' => $booking->id,
-            'amount' => $booking->total_price,
-            'payment_method' => 'QRIS',
-            'qris_code' => 'QRIS-DUMMY-' . $booking->id,
+            'booking_id'       => $booking->id,
+            'amount'           => $booking->total_price,
+            'payment_method'   => 'QRIS',
+
+            // hotel
+            'hotel_name'       => $booking->room->hotel->name,
+
+            // QRIS HOTEL
+            'qris_image_url'   => $booking->room->hotel->qris_image
+                ? asset('storage/' . $booking->room->hotel->qris_image)
+                : null,
+
+            // transaksi
             'transaction_code' => $booking->payment->transaction_code
         ]);
     }

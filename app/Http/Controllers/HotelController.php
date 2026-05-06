@@ -96,6 +96,11 @@ class HotelController extends Controller
             $data['image'] = $path;
         }
 
+        if ($request->hasFile('qris_image')) {
+        $path = $request->file('qris_image')->store('hotels/qris', 'public');
+        $data['qris_image'] = $path;
+        }   
+
         $hotel = Hotel::create($data);
 
         return response()->json([
@@ -120,6 +125,11 @@ class HotelController extends Controller
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('hotels', 'public');
             $data['image'] = $path;
+        }
+
+        if ($request->hasFile('qris_image')) {
+            $path = $request->file('qris_image')->store('hotels/qris', 'public');
+            $data['qris_image'] = $path;
         }
 
         $hotel->update($data);

@@ -13,6 +13,10 @@ use App\Http\Controllers\UserController;
 Route::post('/register', [AuthController::class,'register']);
 Route::post('/login', [AuthController::class,'login']);
 
+//Lupa Password
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
 // hotel public
 Route::get('/hotels', [HotelController::class,'index']);
 Route::get('/hotels/{id}', [HotelController::class,'show']);
