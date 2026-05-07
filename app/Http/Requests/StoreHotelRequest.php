@@ -22,7 +22,8 @@ class StoreHotelRequest extends FormRequest
             'longitude' => 'required|numeric|between:-180,180',
 
             'description' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'qris_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 
@@ -44,7 +45,7 @@ class StoreHotelRequest extends FormRequest
             'image.image' => 'File harus berupa gambar',
             'image.mimes' => 'Format gambar harus jpg, jpeg, atau png',
             'image.max' => 'Ukuran gambar maksimal 2MB',
-            'qris_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'qris_image.max' => 'Ukuran QRIS maksimal 2MB',
         ];
     }
 }

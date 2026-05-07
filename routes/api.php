@@ -10,11 +10,11 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\UserController;
 
 // PUBLIC
-Route::post('/register', [AuthController::class,'register']);
-Route::post('/login', [AuthController::class,'login']);
+Route::post('/register', [AuthController::class,'register'])->middleware('throttle:register');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 //Lupa Password
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:forgot-password');
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // hotel public
