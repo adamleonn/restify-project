@@ -1,0 +1,37 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\Room;
+use App\Models\Hotel;
+
+class RoomSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $floresHotel = Hotel::where('name', 'Flores Gallery Hotel')->first();
+
+        Room::create([
+            'hotel_id' => $floresHotel->id,
+            'room_type' => 'Deluxe Room',
+            'price' => 750000,
+            'status' => 'available',
+            'capacity' => 2,
+            'description' => 'Kamar deluxe nyaman dengan desain artistik dan fasilitas lengkap.',
+            'image' => 'rooms/flores-deluxe.jpg',
+        ]);
+
+        $elHotel = Hotel::where('name', 'éL Hotel Bandung')->first();
+
+        Room::create([
+            'hotel_id' => $elHotel->id,
+            'room_type' => 'Superior Room',
+            'price' => 850000,
+            'status' => 'available',
+            'capacity' => 2,
+            'description' => 'Kamar modern dengan fasilitas premium dan suasana nyaman.',
+            'image' => 'rooms/elhotel-superior.jpg',
+        ]);
+    }
+}

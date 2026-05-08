@@ -17,29 +17,33 @@ class ReceptionistController extends Controller
         $bookings = Booking::whereHas('room', function ($query) use ($hotelId) {
                 $query->where('hotel_id', $hotelId);
             })
-            ->with(['user', 'room.hotel'])
+            ->with(['user', 'room.hotel', 'payment'])
             ->latest()
             ->get();
 
         return response()->json($bookings);
     }
 
-    //Konfirmasi pembayaran
+    // KONFIRMASI BOOKING
     public function confirm(Request $request)
     {
         $request->validate([
-            'transaction_code' => 'required'
+            'transaction_code' => 'required|exists:payments,transaction_code'
         ]);
 
-        $booking = \App\Models\Booking::where('payment_token', $request->transaction_code)
-            ->with('room')
+        // cari payment berdasarkan transaction code
+        $payment = Payment::where('transaction_code', $request->transaction_code)
+            ->with('booking.room')
             ->first();
 
-        if (!$booking) {
+        if (!$payment) {
             return response()->json([
-                'message' => 'Booking tidak ditemukan'
+                'message' => 'Payment tidak ditemukan'
             ], 404);
         }
+
+        // ambil booking
+        $booking = $payment->booking;
 
         // validasi hotel receptionist
         if ($booking->room->hotel_id != auth()->user()->hotel_id) {
@@ -48,7 +52,7 @@ class ReceptionistController extends Controller
             ], 403);
         }
 
-        // cek pembayaran
+        // validasi pembayaran harus paid
         if ($booking->payment_status !== 'paid') {
             return response()->json([
                 'message' => 'Pembayaran belum selesai'
@@ -62,6 +66,7 @@ class ReceptionistController extends Controller
             ], 400);
         }
 
+        // update booking
         $booking->update([
             'status' => 'confirmed'
         ]);
@@ -79,12 +84,21 @@ class ReceptionistController extends Controller
             'transaction_code' => 'required|exists:payments,transaction_code'
         ]);
 
+        // cari payment
         $payment = Payment::where('transaction_code', $request->transaction_code)
             ->with('booking.room')
             ->first();
 
+        if (!$payment) {
+            return response()->json([
+                'message' => 'Payment tidak ditemukan'
+            ], 404);
+        }
+
+        // ambil booking
         $booking = $payment->booking;
 
+        // validasi hotel receptionist
         if ($booking->room->hotel_id != auth()->user()->hotel_id) {
             return response()->json([
                 'message' => 'Akses ditolak'
@@ -98,11 +112,12 @@ class ReceptionistController extends Controller
             ], 400);
         }
 
+        // update booking
         $booking->update([
             'status' => 'checked_in'
         ]);
 
-        // kamar jadi booked saat tamu masuk
+        // update room
         $booking->room->update([
             'status' => 'booked'
         ]);
@@ -122,20 +137,34 @@ class ReceptionistController extends Controller
 
         $booking = Booking::with('room')->find($request->booking_id);
 
+        if (!$booking) {
+            return response()->json([
+                'message' => 'Booking tidak ditemukan'
+            ], 404);
+        }
+
+        // validasi hotel receptionist
         if ($booking->room->hotel_id != auth()->user()->hotel_id) {
             return response()->json([
                 'message' => 'Akses ditolak'
             ], 403);
         }
 
+        // cegah double cancel
         if ($booking->status === 'cancelled') {
             return response()->json([
                 'message' => 'Booking sudah dibatalkan'
             ], 400);
         }
 
+        // update booking
         $booking->update([
             'status' => 'cancelled'
+        ]);
+
+        // update room kembali available
+        $booking->room->update([
+            'status' => 'available'
         ]);
 
         return response()->json([
@@ -144,7 +173,7 @@ class ReceptionistController extends Controller
         ]);
     }
 
-    // UPDATE STATUS KAMAR
+    // UPDATE STATUS ROOM
     public function updateRoomStatus(Request $request)
     {
         $request->validate([
@@ -154,12 +183,20 @@ class ReceptionistController extends Controller
 
         $room = Room::find($request->room_id);
 
+        if (!$room) {
+            return response()->json([
+                'message' => 'Room tidak ditemukan'
+            ], 404);
+        }
+
+        // validasi hotel receptionist
         if ($room->hotel_id != auth()->user()->hotel_id) {
             return response()->json([
                 'message' => 'Akses ditolak'
             ], 403);
         }
 
+        // update room
         $room->update([
             'status' => $request->status
         ]);

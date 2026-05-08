@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Http\Requests\StoreBookingRequest;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class BookingController extends Controller
 {
@@ -58,13 +60,13 @@ class BookingController extends Controller
             'extra_bed' => $request->extra_bed,
             'status' => 'pending',
             'payment_status' => 'pending',
-            'payment_method' => 'qris'
+            'payment_method' => 'midtrans'
         ]);
 
         Payment::create([
             'booking_id' => $booking->id,
             'amount' => $totalPrice,
-            'payment_method' => 'qris',
+            'payment_method' => 'midtrans',
             'status' => 'pending',
             'transaction_code' => $transactionCode
         ]);
@@ -119,9 +121,10 @@ class BookingController extends Controller
         return response()->json($bookings);
     }
 
+
     //Pembayaran
     public function pay(Request $request, $id)
-    {   
+    {
         $user = auth()->user();
 
         $booking = Booking::where('id', $id)
@@ -134,23 +137,135 @@ class BookingController extends Controller
             ], 404);
         }
 
+        // cek apakah sudah dibayar
         if ($booking->payment_status === 'paid') {
             return response()->json([
                 'message' => 'Sudah dibayar'
             ], 400);
         }
 
+        // MIDTRANS CONFIG
+        Config::$serverKey = config('services.midtrans.server_key');
+        Config::$isProduction = config('services.midtrans.is_production');
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // ambil payment
+        $payment = $booking->payment;
+
+        // cek payment
+        if (!$payment) {
+            return response()->json([
+                'message' => 'Data payment tidak ditemukan'
+            ], 404);
+        }
+
+        // parameter transaksi midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => $payment->transaction_code,
+                'gross_amount' => (int) $payment->amount,
+            ],
+
+            'customer_details' => [
+                'first_name' => $user->name,
+                'email' => $user->email,
+            ],
+
+            'enabled_payments' => [
+                'qris',
+                'bank_transfer',
+                'gopay'
+            ],
+        ];
+
+        // generate snap token
+        $snapToken = Snap::getSnapToken($params);
+
+        // simpan token ke booking
         $booking->update([
-            'payment_status' => 'paid',
-            'payment_method' => $request->payment_method,
-            'payment_token' => $request->payment_token
+            'payment_method' => 'midtrans',
+            'payment_token' => $snapToken
         ]);
 
         return response()->json([
-            'message' => 'Pembayaran berhasil',
-            'data' => $booking
+            'message' => 'Snap token berhasil dibuat',
+            'snap_token' => $snapToken,
+            'transaction_code' => $payment->transaction_code,
+            'booking_id' => $booking->id,
+            'gross_amount' => $payment->amount
         ]);
     }
+
+    // MIDTRANS CALLBACK
+    public function midtransCallback(Request $request)
+    {
+        $transactionStatus = $request->transaction_status;
+        $orderId = $request->order_id;
+
+        // cari payment berdasarkan transaction_code
+        $payment = Payment::where('transaction_code', $orderId)->first();
+
+        if (!$payment) {
+            return response()->json([
+                'message' => 'Payment tidak ditemukan'
+            ], 404);
+        }
+
+        // ambil booking
+        $booking = $payment->booking;
+
+        // PAYMENT SUCCESS
+        if (
+            $transactionStatus == 'settlement' ||
+            $transactionStatus == 'capture'
+        ) {
+
+            // update payment
+            $payment->update([
+                'status' => 'paid',
+                'paid_at' => now()
+            ]);
+
+            // update booking
+            $booking->update([
+                'payment_status' => 'paid',
+            ]);
+        }
+
+        // PAYMENT FAILED
+        else if (
+            $transactionStatus == 'deny' ||
+            $transactionStatus == 'expire' ||
+            $transactionStatus == 'cancel'
+        ) {
+
+            $payment->update([
+                'status' => 'failed'
+            ]);
+
+            $booking->update([
+                'payment_status' => 'failed'
+            ]);
+        }
+
+        // PAYMENT PENDING
+        else if ($transactionStatus == 'pending') {
+
+            $payment->update([
+                'status' => 'pending'
+            ]);
+
+            $booking->update([
+                'payment_status' => 'pending'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Callback berhasil diproses'
+        ]);
+    }
+
 
     //UserCheckOut
     public function checkout($id)
@@ -173,11 +288,16 @@ class BookingController extends Controller
             return response()->json([
                 'message' => 'Status tidak valid untuk checkout'
             ], 400);
-        }
+        }   
 
         // update status
         $booking->update([
             'status' => 'completed'
+        ]);
+
+         // room kembali available
+        $booking->room->update([
+            'status' => 'available'
         ]);
 
         return response()->json([
@@ -202,15 +322,21 @@ class BookingController extends Controller
         }
 
         return response()->json([
-            'booking_id'       => $booking->id,
-            'amount'           => $booking->total_price,
-            'payment_method'   => 'QRIS',
+
+            // booking
+            'booking_id' => $booking->id,
+            'amount' => $booking->total_price,
+
+            // payment
+            'payment_method' => $booking->payment->payment_method,
+            'payment_status' => $booking->payment_status,
+            'snap_token' => $booking->payment_token,
 
             // hotel
-            'hotel_name'       => $booking->room->hotel->name,
+            'hotel_name' => $booking->room->hotel->name,
 
-            // QRIS HOTEL
-            'qris_image_url'   => $booking->room->hotel->qris_image
+            // qris hotel
+            'qris_image_url' => $booking->room->hotel->qris_image
                 ? asset('storage/' . $booking->room->hotel->qris_image)
                 : null,
 

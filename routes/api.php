@@ -23,6 +23,9 @@ Route::get('/hotels/{id}', [HotelController::class,'show']);
 Route::get('/hotels/{id}/ratings', [RatingController::class,'hotelRatings']);
 Route::get('/hotels/{id}/rooms', [RoomController::class,'roomsByHotel']);
 
+// MIDTRANS CALLBACK
+Route::post('/midtrans/callback', [BookingController::class, 'midtransCallback']);
+
 
 // AUTH
 Route::middleware('auth:sanctum')->group(function () {
