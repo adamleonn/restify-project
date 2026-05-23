@@ -53,12 +53,14 @@ Route::middleware(['auth:sanctum','role:user'])
     ->group(function () {
 
     Route::post('/booking', [BookingController::class,'store']);
+    Route::post('/cancel-booking/{id}', [BookingController::class, 'cancel']);
     Route::get('/booking-history', [BookingController::class,'history']);
     Route::get('/payment/{id}', [BookingController::class,'paymentDetail']);
     Route::post('/pay/{id}', [BookingController::class,'pay']);
     Route::post('/checkout/{id}', [BookingController::class,'checkout']);
     Route::post('/ratings', [RatingController::class,'store']);
-});
+    Route::post('/upload-profile', [AuthController::class, 'uploadProfile']);
+}); 
 
 
 // RECEPTIONIST

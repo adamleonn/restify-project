@@ -70,6 +70,42 @@ class AuthController extends Controller
     }
 
 
+    // UPLOAD PROFILE PICTURE
+    public function uploadProfile(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $user = auth()->user();
+
+        // hapus foto lama jika ada
+        if ($user->profile_picture) {
+
+            $oldPath = public_path('storage/' . $user->profile_picture);
+
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
+            }
+        }
+
+        // simpan foto baru
+        $path = $request->file('profile_picture')
+            ->store('profiles', 'public');
+
+        // update user
+        $user->update([
+            'profile_picture' => $path
+        ]);
+
+        return response()->json([
+            'message' => 'Foto profile berhasil diupload',
+            'profile_picture' => $path,
+            'image_url' => asset('storage/' . $path)
+        ]);
+    }
+
+
     // LOGOUT
     public function logout(Request $request)
     {

@@ -13,8 +13,13 @@ class Hotel extends Model
         'latitude',
         'longitude',
         'description',
+        'facilities',
         'image',
-        'qris_image'
+        'qris_image',
+    ];
+
+    protected $casts = [
+    'facilities' => 'array'
     ];
 
     protected $appends = [

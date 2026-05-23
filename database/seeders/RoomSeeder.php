@@ -10,7 +10,10 @@ class RoomSeeder extends Seeder
 {
     public function run(): void
     {
-        $floresHotel = Hotel::where('name', 'Flores Gallery Hotel')->first();
+        $floresHotel = Hotel::where(
+            'name',
+            'Flores Gallery Hotel'
+        )->first();
 
         Room::create([
             'hotel_id' => $floresHotel->id,
@@ -18,11 +21,26 @@ class RoomSeeder extends Seeder
             'price' => 750000,
             'status' => 'available',
             'capacity' => 2,
-            'description' => 'Kamar deluxe nyaman dengan desain artistik dan fasilitas lengkap.',
+
+            'description' =>
+                'Kamar deluxe nyaman dengan desain artistik dan fasilitas lengkap.',
+
+            'facilities' => [
+                'AC',
+                'TV',
+                'Wifi',
+                'Hot Water',
+                'Breakfast'
+            ],
+
             'image' => 'rooms/flores-deluxe.jpg',
         ]);
 
-        $elHotel = Hotel::where('name', 'éL Hotel Bandung')->first();
+
+        $elHotel = Hotel::where(
+            'name',
+            'eL Hotel Bandung'
+        )->first();
 
         Room::create([
             'hotel_id' => $elHotel->id,
@@ -30,7 +48,18 @@ class RoomSeeder extends Seeder
             'price' => 850000,
             'status' => 'available',
             'capacity' => 2,
-            'description' => 'Kamar modern dengan fasilitas premium dan suasana nyaman.',
+
+            'description' =>
+                'Kamar modern dengan fasilitas premium dan suasana nyaman.',
+
+            'facilities' => [
+                'AC',
+                'Netflix TV',
+                'Wifi',
+                'Mini Bar',
+                'Breakfast'
+            ],
+
             'image' => 'rooms/elhotel-superior.jpg',
         ]);
     }

@@ -22,6 +22,8 @@ class StoreHotelRequest extends FormRequest
             'longitude' => 'required|numeric|between:-180,180',
 
             'description' => 'nullable|string|max:1000',
+            'facilities' => 'nullable|array',
+            'facilities.*' => 'string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'qris_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];

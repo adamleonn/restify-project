@@ -7,6 +7,7 @@ use App\Models\Room;
 use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Http\Requests\StoreBookingRequest;
 use Midtrans\Config;
@@ -18,105 +19,324 @@ class BookingController extends Controller
     {
         $user = auth()->user();
 
-        $room = Room::find($request->room_id);
+        return DB::transaction(function () use ($request, $user) {
 
-        if (!$room || $room->status !== 'available') {
+            //LOCK ROOM (ANTI RACE CONDITION)
+            $room = Room::where('id', $request->room_id)
+                ->lockForUpdate()
+                ->first();
+
+            
+            //NGCEK ROOM ADA ATAU TIDAK
+            if (!$room) {
+                return response()->json([
+                    'message' => 'Room tidak ditemukan'
+                ], 404);
+            }
+
+            //ROOM STATUS CHECK 
+            if ($room->status !== 'available') {
+                return response()->json([
+                    'message' => 'Kamar sedang tidak tersedia'
+                ], 400);
+            }
+
+            //CHECH-IN DATE VALIDATION
+            if (
+                Carbon::parse($request->check_in_date)
+                    ->startOfDay()
+                    ->lt(now()->startOfDay())
+            ) {
+                return response()->json([
+                    'message' => 'Tanggal check in tidak valid'
+                ], 422);
+            }
+
+            //CHECK BOOKING OVERLAP
+            $isBooked = Booking::where('room_id', $room->id)
+
+                // booking aktif
+                ->where(function ($query) {
+
+                    $query->where('payment_status', 'paid')
+
+                        ->orWhere(function ($q) {
+
+                            $q->where('payment_status', 'pending')
+                                ->where('expired_at', '>', now());
+
+                        });
+
+                })
+
+                // overlap tanggal
+                ->where(function ($query) use ($request) {
+
+                    $query->where(
+                        'check_in_date',
+                        '<',
+                        $request->check_out_date
+                    )
+                    ->where(
+                        'check_out_date',
+                        '>',
+                        $request->check_in_date
+                    );
+
+                })
+
+                ->exists();
+
+            
+            //NGCEK ROOM SUDAH DI BOOKING
+            if ($isBooked) {
+                return response()->json([
+                    'message' => 'Kamar sudah dibooking pada tanggal tersebut'
+                ], 422);
+            }
+
+            
+            //JUMLAH KAN MALAM 
+            $nights = Carbon::parse($request->check_in_date)
+                ->diffInDays(
+                    Carbon::parse($request->check_out_date)
+                );
+
+            
+            //MINIMUM 1 MALAM
+            if ($nights < 1) {
+                return response()->json([
+                    'message' => 'Minimal booking 1 malam'
+                ], 422);
+            }
+
+            //ROOM CAPACITY VALIDATION
+            $maxCapacity = $room->capacity;
+
+            if ($request->extra_bed) {
+                $maxCapacity += 1;
+            }
+
+            if ($request->guests > $maxCapacity) {
+                return response()->json([
+                    'message' => 'Jumlah tamu melebihi kapasitas kamar'
+                ], 422);
+            }
+
+            //TOTAL PRICE
+            $totalPrice = $room->price * $nights;
+
+            // extra bed
+            if ($request->extra_bed) {
+                $totalPrice += 100000 * $nights;
+            }
+
+            //UNIQUE TRANCSACTION CODE
+            do {
+
+                $transactionCode =
+                    'TRX-' . strtoupper(Str::random(8));
+
+            } while (
+
+                Payment::where(
+                    'transaction_code',
+                    $transactionCode
+                )->exists()
+
+            );
+
+            //CREATE BOOKING
+            $booking = Booking::create([
+                'user_id' => $user->id,
+                'room_id' => $room->id,
+                'check_in_date' => $request->check_in_date,
+                'check_out_date' => $request->check_out_date,
+                'nights' => $nights,
+                'total_price' => $totalPrice,
+                'guests' => $request->guests,
+                'extra_bed' => $request->extra_bed,
+                // booking status
+                'status' => 'pending',
+                // payment
+                'payment_status' => 'pending',
+                'payment_method' => 'midtrans',
+                // booking expired
+                'expired_at' => now()->addMinutes(15)
+            ]);
+
+
+            //CREATE PAYMENT
+            Payment::create([
+                'booking_id' => $booking->id,
+                'amount' => $totalPrice,
+                'payment_method' => 'midtrans',
+                'status' => 'pending',
+                'transaction_code' => $transactionCode
+            ]);
+
+
+            //RESPONSE
             return response()->json([
-                'message' => 'Kamar tidak tersedia'
-            ], 400);
-        }
 
-        $nights = Carbon::parse($request->check_in_date)
-            ->diffInDays(Carbon::parse($request->check_out_date));
+                'message' => 'Booking berhasil dibuat',
 
-        $maxCapacity = $room->capacity;
+                'data' => [
+                    'booking_id' => $booking->id,
+                    'status' => $booking->status,
+                    'payment_status' => $booking->payment_status,
+                    'expired_at' => $booking->expired_at,
+                    'total_price' => $booking->total_price,
+                    'room_id' => $booking->room_id,
+                ]
 
-        if ($request->extra_bed) {
-            $maxCapacity += 1;
-        }
+            ], 201);
 
-        if ($request->guests > $maxCapacity) {
-            return response()->json([
-                'message' => 'Jumlah tamu melebihi kapasitas kamar'
-            ], 422);
-        }
-
-        $totalPrice = $room->price * $nights;
-
-        if ($request->extra_bed) {
-            $totalPrice += 100000 * $nights;
-        }
-
-        $transactionCode = 'TRX-' . strtoupper(Str::random(8));
-
-        $booking = Booking::create([
-            'user_id' => $user->id,
-            'room_id' => $request->room_id,
-            'check_in_date' => $request->check_in_date,
-            'check_out_date' => $request->check_out_date,
-            'nights' => $nights,
-            'total_price' => $totalPrice,
-            'guests' => $request->guests,
-            'extra_bed' => $request->extra_bed,
-            'status' => 'pending',
-            'payment_status' => 'pending',
-            'payment_method' => 'midtrans'
-        ]);
-
-        Payment::create([
-            'booking_id' => $booking->id,
-            'amount' => $totalPrice,
-            'payment_method' => 'midtrans',
-            'status' => 'pending',
-            'transaction_code' => $transactionCode
-        ]);
-
-        return response()->json([
-            'message' => 'Booking berhasil',
-            'data' => $booking
-        ], 201);
+        });
     }
 
+
     //HistoryBooking By User
-    public function history()
+    public function history(Request $request)
     {
         $user = auth()->user();
 
-        $bookings = \App\Models\Booking::with(['room.hotel'])
-            ->where('user_id', $user->id)
-            ->latest()
-            ->get();
+        $query = Booking::with([
+                'room.hotel',
+                'payment'
+            ])
+            ->where('user_id', $user->id);
+        
+        //SEARCH TRANSACTION CODE
+        if ($request->filled('search')) {
+
+            $query->whereHas('payment', function ($q) use ($request) {
+
+                $q->where(
+                    'transaction_code',
+                    'like',
+                    '%' . $request->search . '%'
+                );
+            });
+        }
+
+        //FILTER BOOKING STATUS
+        if ($request->filled('status')) {
+
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        //FILTER PAYMENT STATUS
+        if ($request->filled('payment_status')) {
+
+            $query->where(
+                'payment_status',
+                $request->payment_status
+            );
+        }
+
+        //SORTING
+        $query->latest();
+        
+        //PAGINATION
+        $perPage = $request->get('per_page', 10);
+
+        $bookings = $query->paginate($perPage);
 
         return response()->json($bookings);
     }
 
-    public function show($id)
+
+    // GET ALL BOOKINGS BY ADMIN
+    public function allBookings(Request $request)
     {
-        $user = auth()->user();
+        $query = Booking::with([
+                'user:id,name,email',
+                'room.hotel',
+                'payment'
+            ]);
 
-        $booking = \App\Models\Booking::with(['room.hotel'])
-            ->where('id', $id)
-            ->where('user_id', $user->id)
-            ->first();
+        //SEARCH
+        if ($request->filled('search')) {
 
-        if (!$booking) {
-            return response()->json([
-                'message' => 'Booking tidak ditemukan'
-            ], 404);
+            $query->where(function ($q) use ($request) {
+
+                // search user
+                $q->whereHas('user', function ($userQuery) use ($request) {
+
+                    $userQuery->where(
+                        'name',
+                        'like',
+                        '%' . $request->search . '%'
+                    );
+
+                })
+
+                // search transaction
+                ->orWhereHas('payment', function ($paymentQuery) use ($request) {
+
+                    $paymentQuery->where(
+                        'transaction_code',
+                        'like',
+                        '%' . $request->search . '%'
+                    );
+
+                });
+
+            });
         }
 
-        return response()->json($booking);
-    }
+        
+        //FILTER BOOKING STATUS
+        if ($request->filled('status')) {
 
-    //Get All bookings by admin
-    public function allBookings()
-    {
-        $bookings = \App\Models\Booking::with([
-            'user:id,name,email',
-            'room.hotel'
-        ])
-        ->latest()
-        ->get();
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+        //FILTER PAYMENT STATUS
+        if ($request->filled('payment_status')) {
+
+            $query->where(
+                'payment_status',
+                $request->payment_status
+            );
+        }
+
+        //FILTER HOTEL
+        if ($request->filled('hotel_id')) {
+
+            $query->whereHas('room', function ($q) use ($request) {
+
+                $q->where(
+                    'hotel_id',
+                    $request->hotel_id
+                );
+
+            });
+        }
+
+        //SORTING
+        switch ($request->sort) {
+
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            default:
+                $query->latest();
+                break;
+        }
+
+        //PAGINATION
+        $perPage = $request->get('per_page', 10);
+
+        $bookings = $query->paginate($perPage);
 
         return response()->json($bookings);
     }
@@ -306,6 +526,48 @@ class BookingController extends Controller
         ]);
     }
 
+    // USER CANCEL BOOKING
+    public function cancel($id)
+    {
+        $user = auth()->user();
+
+        $booking = Booking::with('payment')
+            ->where('id', $id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        // booking tidak ditemukan
+        if (!$booking) {
+            return response()->json([
+                'message' => 'Booking tidak ditemukan'
+            ], 404);
+        }
+
+        // hanya pending yang boleh dicancel
+        if ($booking->status !== 'pending') {
+            return response()->json([
+                'message' => 'Booking tidak bisa dibatalkan'
+            ], 400);
+        }
+
+        // update booking
+        $booking->update([
+            'status' => 'cancelled',
+            'payment_status' => 'failed'
+        ]);
+
+        // update payment
+        if ($booking->payment) {
+
+            $booking->payment->update([
+                'status' => 'failed'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Booking berhasil dibatalkan'
+        ]);
+    }
 
     // Pembayaran Detail
     public function paymentDetail($id)
