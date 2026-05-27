@@ -250,6 +250,31 @@ class BookingController extends Controller
     }
 
 
+    // BOOKING DETAIL for user
+    public function show($id)
+    {
+        $booking = Booking::with([
+            'room.hotel',
+            'payment'
+        ])
+        ->where('id', $id)
+        ->where('user_id', auth()->id())
+        ->first();
+
+        if (!$booking) {
+
+            return response()->json([
+                'message' => 'Booking tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Detail booking berhasil diambil',
+            'data' => $booking
+        ]);
+    }
+
+
     // GET ALL BOOKINGS BY ADMIN
     public function allBookings(Request $request)
     {
