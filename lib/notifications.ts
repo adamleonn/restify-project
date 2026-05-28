@@ -72,12 +72,20 @@ export const notify = {
 
         // ── Authorization ──────────────────────────────────
         accessDenied: () =>
-            toast.error('Anda tidak memiliki akses ke halaman ini'),
+            toast.error('Harap setujui syarat dan ketentuan sebelum melanjutkan.'),
 
         sessionExpired: () =>
             toast.error('Sesi telah berakhir, silakan login kembali'),
+        resetLinkSent: () =>
+            toast.success('Link reset password telah dikirim ke email Anda.'),
+        passwordResetSuccess: () =>
+            toast.success('Kata sandi berhasil direset. Silakan login kembali.'),
+        passwordMismatch: () =>
+            toast.error('Kata sandi dan konfirmasi kata sandi tidak cocok. Silakan periksa kembali.'),
+
     },
 
+    
     // ─── HOTEL & ROOM ──────────────────────────────────────────────────────────
     hotel: {
         loaded: () =>

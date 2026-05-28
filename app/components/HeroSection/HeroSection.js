@@ -15,17 +15,25 @@ const HeroSection = () => {
           <img src="/images/Logo.png" alt="Restify Logo" className="logo-img" />
         </div>
 
-        <p className="subtitle">
-          Temukan Tempat Menginap yang <br />
-          Sempurna untuk Anda!
-        </p>
+        {/* Teks diubah sesuai gambar */}
+        <h2 className="title">Mari Kita Mulai!</h2>
 
-        <button
-          className="start-btn"
-          onClick={() => router.push("/welcome")}
-        >
-          Mulai <span>→</span>
-        </button>
+        {/* Menggunakan container flex untuk dua tombol */}
+        <div className="button-group">
+          <button
+            className="action-btn"
+            onClick={() => router.push("/login")}
+          >
+            Masuk
+          </button>
+          
+          <button
+            className="action-btn"
+            onClick={() => router.push("/register")}
+          >
+            Daftar
+          </button>
+        </div>
 
       </div>
     </div>

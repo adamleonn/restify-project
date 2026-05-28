@@ -1,14 +1,27 @@
 .hero {
   height: 100vh;
-  width: 100%;
-  background-color: #e5e5e5;
+  width: 100vw; /* Memastikan lebar penuh sesuai jendela browser */
+  background-image: url('/images/Restify_BG.png');
+  
+  /* UBAH DI SINI: Memaksa gambar mengikuti tinggi dan lebar jendela */
+  background-size: 100% 100%; 
+  
+  background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
+  
+  /* TAMBAHKAN INI: Menghilangkan scrollbar jika ada sisa pixel rahasia */
+  overflow: hidden; 
+  
+  opacity: 0;
+  animation: heroFadeIn 0.8s ease forwards;
 }
 
 .hero-content {
   text-align: center;
+  z-index: 1; /* Memastikan konten tetap di atas background */
 }
 
 /* Circle Logo */
@@ -20,7 +33,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 30px; /* Jarak bawah sedikit ditambah agar proporsional */
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   overflow: hidden;
 }
@@ -28,29 +41,27 @@
 .logo-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
-.logo-icon {
-  font-size: 60px;
-  margin-bottom: 10px;
+/* Styling untuk teks "Mari Kita Mulai!" */
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+  font-family: "Poppins", sans-serif; /* Mengikuti gaya font yang ada */
 }
 
-.logo-text {
-  font-family: "Poppins", sans-serif;
-  font-weight: 300;
-  letter-spacing: 8px;
+/* Container untuk menjajarkan dua tombol */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
-/* Subtitle */
-.subtitle {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-/* Button */
-.start-btn {
+/* Styling untuk tombol Masuk dan Daftar */
+.action-btn {
   background-color: #5f7054;
   color: #fff;
   border: none;
@@ -58,20 +69,17 @@
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
+  min-width: 140px; /* Memastikan lebar kedua tombol sama */
   display: inline-flex;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
   transition: 0.3s;
+  font-family: "Poppins", sans-serif;
 }
 
-.start-btn:hover {
+.action-btn:hover {
   background-color: #4e5d45;
   transform: translateY(-2px);
-}
-
-.hero {
-  opacity: 0;
-  animation: heroFadeIn 0.8s ease forwards;
 }
 
 @keyframes heroFadeIn {
@@ -79,4 +87,3 @@
     opacity: 1;
   }
 }
-
