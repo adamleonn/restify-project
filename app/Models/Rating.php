@@ -32,7 +32,7 @@ class Rating extends Model
         return $this->belongsTo(Booking::class);
     }
 
-    // ✅ ACCESSOR IMAGE
+    //ACCESSOR IMAGE
     public function getImageUrlAttribute()
     {
         return $this->image

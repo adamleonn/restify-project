@@ -9,7 +9,7 @@ use App\Http\Requests\StoreUserRequest;
 
 class UserController extends Controller
 {
-    // GET ALL USERS
+    // GET ALL USERS by admin
     public function index()
     {
         $users = User::with([
@@ -23,7 +23,7 @@ class UserController extends Controller
     }
 
 
-    // GET DETAIL USER
+    // GET DETAIL USER by admin 
     public function show($id)
     {
         $user = User::with([
@@ -41,7 +41,7 @@ class UserController extends Controller
     }
 
 
-    // CREATE USER
+    // CREATE USER by admin 
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
@@ -69,7 +69,7 @@ class UserController extends Controller
     }
 
 
-    // UPDATE USER
+    // UPDATE USER by admin 
     public function update(Request $request,$id)
     {
         $user = User::find($id);
@@ -87,6 +87,9 @@ class UserController extends Controller
 
             'email' =>
                 'sometimes|email|unique:users,email,' . $id,
+
+            'phone' => 
+                'nullable|string|max:13',
 
             'password' =>
                 'nullable|min:6',
@@ -157,7 +160,7 @@ class UserController extends Controller
     }
 
 
-    // DELETE USER
+    // DELETE USER by admin 
     public function destroy($id)
     {
         $user = User::find($id);

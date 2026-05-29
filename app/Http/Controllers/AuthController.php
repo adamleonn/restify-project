@@ -22,17 +22,30 @@ class AuthController extends Controller
         $data = $request->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => 2
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+            'password' => Hash::make($data['password']),
+            'role_id' => 2, // role user/tamu
+            'hotel_id' => null
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Register berhasil',
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role_id' => $user->role_id,
+                'hotel_id' => $user->hotel_id,
+                'profile_picture' => $user->profile_picture,
+                'profile_picture_url' => $user->profile_picture
+                    ? asset('storage/' . $user->profile_picture)
+                    : null,
+            ],
             'token' => $token
         ], 201);
     }
@@ -61,11 +74,31 @@ class AuthController extends Controller
     }
 
 
-    //Untuk Melihat Profile
+    // UNTUK MELIHAT PROFILE
     public function profile(Request $request)
     {
-    return response()->json([
-        'user' => $request->user()
+        $user = $request->user()->load('role');
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone ?? null,
+
+                'role_id' => $user->role_id,
+                'role_name' => $user->role->name ?? null,
+
+                'hotel_id' => $user->hotel_id,
+
+                'profile_picture' => $user->profile_picture,
+                'profile_picture_url' => $user->profile_picture
+                    ? asset('storage/' . $user->profile_picture)
+                    : null,
+
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+            ]
         ]);
     }
 
