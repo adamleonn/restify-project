@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 
 class UserController extends Controller
 {
@@ -70,7 +70,7 @@ class UserController extends Controller
 
 
     // UPDATE USER by admin 
-    public function update(Request $request,$id)
+    public function update(UpdateUserRequest $request, $id)
     {
         $user = User::find($id);
 
@@ -80,27 +80,7 @@ class UserController extends Controller
             ],404);
         }
 
-        $validated = $request->validate([
-
-            'name' =>
-                'sometimes|string|max:255',
-
-            'email' =>
-                'sometimes|email|unique:users,email,' . $id,
-
-            'phone' => 
-                'nullable|string|max:13',
-
-            'password' =>
-                'nullable|min:6',
-
-            'role_id' =>
-                'sometimes|exists:roles,id',
-
-            'hotel_id' =>
-                'nullable|exists:hotels,id'
-        ]);
-
+        $validated = $request->validated();
 
         // ADMIN SEEDED TIDAK BOLEH DIUBAH
         if ($user->role_id == 1) {

@@ -184,11 +184,7 @@ class AuthController extends Controller
     // RESET PASSWORD
     public function resetPassword(resetPassword $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|min:6|confirmed'
-        ]);
+        $data = $request->validated();
 
         $reset = DB::table('password_reset_tokens')
             ->where('email', $request->email)

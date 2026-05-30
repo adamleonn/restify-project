@@ -25,7 +25,6 @@ class Hotel extends Model
     protected $appends = [
         'average_rating',
         'image_url',
-        'qris_image_url',
     ];
 
     // RELATION: HOTEL -> ROOMS

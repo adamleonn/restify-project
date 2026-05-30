@@ -15,7 +15,7 @@ class ReceptionistSeeder extends Seeder
             [
                 'name' => 'Receptionist Flores Gallery',
                 'email' => 'receptionist@flores.com',
-                'password' => Hash::make('recep12345'),
+                'password' => Hash::make('Recep12345'),
                 'role_id' => 3,
                 'hotel_id' => 1,
                 'created_at' => now(),
@@ -25,7 +25,7 @@ class ReceptionistSeeder extends Seeder
             [
                 'name' => 'Receptionist El Hotel',
                 'email' => 'receptionist@elhotel.com',
-                'password' => Hash::make('recep123456'),
+                'password' => Hash::make('Recep123456'),
                 'role_id' => 3,
                 'hotel_id' => 2,
                 'created_at' => now(),
