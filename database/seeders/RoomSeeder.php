@@ -3,64 +3,133 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Room;
 use App\Models\Hotel;
+use App\Models\Room;
 
 class RoomSeeder extends Seeder
 {
     public function run(): void
     {
-        $floresHotel = Hotel::where(
-            'name',
-            'Flores Gallery Hotel'
-        )->first();
+        $hotels = Hotel::all();
 
-        Room::create([
-            'hotel_id' => $floresHotel->id,
-            'room_type' => 'Deluxe Room',
-            'price' => 750000,
-            'status' => 'available',
-            'capacity' => 2,
+        foreach ($hotels as $hotel) {
 
-            'description' =>
-                'Kamar deluxe nyaman dengan desain artistik dan fasilitas lengkap.',
+            /*
+            |--------------------------------------------------------------------------
+            | BANDUNG HOTELS
+            |--------------------------------------------------------------------------
+            | 2 type room
+            | setiap type punya 2 room
+            */
 
-            'facilities' => [
-                'AC',
-                'TV',
-                'Wifi',
-                'Hot Water',
-                'Breakfast'
-            ],
+            if ($hotel->city === 'Bandung') {
 
-            'image' => 'rooms/flores-deluxe.jpg',
-        ]);
+                // Type 1: Deluxe Room, 2 kamar
+                for ($i = 1; $i <= 2; $i++) {
+                    Room::create([
+                        'hotel_id' => $hotel->id,
+                        'room_type' => 'Deluxe Room',
+                        'price' => 750000,
+                        'status' => 'available',
+                        'capacity' => 2,
+                        'description' => 'Kamar deluxe nyaman dengan fasilitas lengkap untuk tamu yang menginginkan kenyamanan standar premium.',
+                        'facilities' => [
+                            'AC',
+                            'Wifi',
+                            'Smart TV',
+                            'Hot Water',
+                            'Breakfast'
+                        ],
+                        'image' => 'rooms/deluxe-room.jpg',
+                    ]);
+                }
+
+                // Type 2: Superior Room, 2 kamar
+                for ($i = 1; $i <= 2; $i++) {
+                    Room::create([
+                        'hotel_id' => $hotel->id,
+                        'room_type' => 'Superior Room',
+                        'price' => 950000,
+                        'status' => 'available',
+                        'capacity' => 3,
+                        'description' => 'Kamar superior dengan ruang lebih luas dan fasilitas premium untuk keluarga atau perjalanan bisnis.',
+                        'facilities' => [
+                            'AC',
+                            'Wifi',
+                            'Netflix TV',
+                            'Mini Bar',
+                            'Bathtub'
+                        ],
+                        'image' => 'rooms/superior-room.jpg',
+                    ]);
+                }
+            }
 
 
-        $elHotel = Hotel::where(
-            'name',
-            'eL Hotel Bandung'
-        )->first();
+            /*
+            |--------------------------------------------------------------------------
+            | JAKARTA HOTELS
+            |--------------------------------------------------------------------------
+            | 3 type room
+            | setiap type punya 1 room
+            */
 
-        Room::create([
-            'hotel_id' => $elHotel->id,
-            'room_type' => 'Superior Room',
-            'price' => 850000,
-            'status' => 'available',
-            'capacity' => 2,
+            if ($hotel->city === 'Jakarta') {
 
-            'description' =>
-                'Kamar modern dengan fasilitas premium dan suasana nyaman.',
+                // Type 1: Standard Room, 1 kamar
+                Room::create([
+                    'hotel_id' => $hotel->id,
+                    'room_type' => 'Standard Room',
+                    'price' => 650000,
+                    'status' => 'available',
+                    'capacity' => 2,
+                    'description' => 'Kamar standard yang nyaman untuk tamu bisnis maupun wisatawan dengan fasilitas dasar lengkap.',
+                    'facilities' => [
+                        'AC',
+                        'Wifi',
+                        'TV',
+                        'Hot Water'
+                    ],
+                    'image' => 'rooms/standard-room.jpg',
+                ]);
 
-            'facilities' => [
-                'AC',
-                'Netflix TV',
-                'Wifi',
-                'Mini Bar',
-                'Breakfast'
-            ],
+                // Type 2: Deluxe Room, 1 kamar
+                Room::create([
+                    'hotel_id' => $hotel->id,
+                    'room_type' => 'Deluxe Room',
+                    'price' => 900000,
+                    'status' => 'available',
+                    'capacity' => 2,
+                    'description' => 'Kamar deluxe modern dengan fasilitas lebih lengkap dan suasana nyaman di pusat kota.',
+                    'facilities' => [
+                        'AC',
+                        'Wifi',
+                        'Smart TV',
+                        'Breakfast',
+                        'Work Desk'
+                    ],
+                    'image' => 'rooms/deluxe-room.jpg',
+                ]);
 
-            'image' => 'rooms/elhotel-superior.jpg',
-        ]);
+                // Type 3: Executive Room, 1 kamar
+                Room::create([
+                    'hotel_id' => $hotel->id,
+                    'room_type' => 'Executive Room',
+                    'price' => 1250000,
+                    'status' => 'available',
+                    'capacity' => 3,
+                    'description' => 'Kamar executive dengan fasilitas premium untuk kebutuhan bisnis dan pengalaman menginap yang lebih eksklusif.',
+                    'facilities' => [
+                        'AC',
+                        'Wifi',
+                        'Netflix TV',
+                        'Mini Bar',
+                        'Bathtub',
+                        'City View'
+                    ],
+                    'image' => 'rooms/executive-room.jpg',
+                ]);
+            }
+        }
     }
 }
