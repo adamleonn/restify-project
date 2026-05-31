@@ -14,9 +14,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'role_id',
-        'hotel_id'
+        'hotel_id',
+        'profile_picture',
     ];
 
     protected $hidden = [
@@ -27,6 +29,17 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    protected $appends = [
+        'profile_picture_url',
+    ];
+
+    public function getProfilePictureUrlAttribute()
+    {
+        return $this->profile_picture
+            ? asset('storage/' . $this->profile_picture)
+            : null;
+    }
 
     public function role()
     {

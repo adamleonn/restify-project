@@ -13,7 +13,12 @@ class Room extends Model
         'capacity',
         'status',
         'description',
-        'image' 
+        'facilities',
+        'image', 
+    ];
+
+    protected $casts = [
+    'facilities' => 'array'
     ];
 
     protected $appends = ['image_url']; 

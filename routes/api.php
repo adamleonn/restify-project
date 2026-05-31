@@ -10,14 +10,21 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\UserController;
 
 // PUBLIC
-Route::post('/register', [AuthController::class,'register']);
-Route::post('/login', [AuthController::class,'login']);
+Route::post('/register', [AuthController::class,'register'])->middleware('throttle:register');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+
+//Lupa Password
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:forgot-password');
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // hotel public
 Route::get('/hotels', [HotelController::class,'index']);
 Route::get('/hotels/{id}', [HotelController::class,'show']);
 Route::get('/hotels/{id}/ratings', [RatingController::class,'hotelRatings']);
 Route::get('/hotels/{id}/rooms', [RoomController::class,'roomsByHotel']);
+
+// MIDTRANS CALLBACK
+Route::post('/midtrans/callback', [BookingController::class, 'midtransCallback']);
 
 
 // AUTH
@@ -46,12 +53,14 @@ Route::middleware(['auth:sanctum','role:user'])
     ->group(function () {
 
     Route::post('/booking', [BookingController::class,'store']);
+    Route::post('/cancel-booking/{id}', [BookingController::class, 'cancel']);
     Route::get('/booking-history', [BookingController::class,'history']);
     Route::get('/payment/{id}', [BookingController::class,'paymentDetail']);
     Route::post('/pay/{id}', [BookingController::class,'pay']);
     Route::post('/checkout/{id}', [BookingController::class,'checkout']);
     Route::post('/ratings', [RatingController::class,'store']);
-});
+    Route::post('/upload-profile', [AuthController::class, 'uploadProfile']);
+}); 
 
 
 // RECEPTIONIST

@@ -20,6 +20,8 @@ class StoreRoomRequest extends FormRequest
             'capacity' => 'required|integer|min:1',
             'status' => 'required|in:available,booked,maintenance',
             'description' => 'nullable|string',
+            'facilities' => 'nullable|array',
+            'facilities.*' => 'string|max:255',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ];
     }

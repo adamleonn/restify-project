@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
 
-class StoreUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -14,21 +14,23 @@ class StoreUserRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|max:255',
+        $userId = $this->route('user');
 
-            'email' => 'required|email|unique:users,email',
+        return [
+            'name' => 'sometimes|string|max:255',
+
+            'email' => 'sometimes|email|unique:users,email,' . $userId,
 
             'phone' => 'nullable|string|min:10|max:13',
 
             'password' => [
-                'required',
+                'nullable',
                 Password::min(8)
                     ->mixedCase()
                     ->numbers()
             ],
 
-            'role_id' => 'required|exists:roles,id',
+            'role_id' => 'sometimes|exists:roles,id',
 
             'hotel_id' => 'nullable|exists:hotels,id',
         ];
@@ -38,7 +40,6 @@ class StoreUserRequest extends FormRequest
     {
         $validator->after(function ($validator) {
 
-            // role_id = 3 receptionist
             if ($this->role_id == 3 && empty($this->hotel_id)) {
                 $validator->errors()->add(
                     'hotel_id',
@@ -52,20 +53,15 @@ class StoreUserRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama wajib diisi',
+            'name.max' => 'Nama maksimal 255 karakter',
 
-            'email.required' => 'Email wajib diisi',
             'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah digunakan',
 
             'phone.min' => 'Nomor telepon minimal 10 karakter',
             'phone.max' => 'Nomor telepon maksimal 13 karakter',
 
-            'password.required' => 'Password wajib diisi',
-
-            'role_id.required' => 'Role wajib diisi',
             'role_id.exists' => 'Role tidak valid',
-
             'hotel_id.exists' => 'Hotel tidak ditemukan',
         ];
     }
