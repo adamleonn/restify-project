@@ -18,7 +18,8 @@ class Booking extends Model
         'status',
         'payment_status',
         'payment_method',
-        'payment_token'
+        'payment_token',
+        'expired_at',
     ];
 
     protected $casts = [

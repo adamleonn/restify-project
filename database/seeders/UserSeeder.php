@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'Admin Restify',
             'email' => 'admin@restify.com',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('Admin1234'),
             'role_id' => 1, 
             'hotel_id' => null
         ]);
